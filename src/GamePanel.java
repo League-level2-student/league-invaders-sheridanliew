@@ -5,8 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Timer;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements ActionListener, KeyListener {
@@ -18,6 +20,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	Font bodyFont;
 	Timer frameDraw;
 	Rocketship r;
+	ObjectManager om;
+	public static BufferedImage image;
+	public static boolean needImage = true;
+	public static boolean gotImage = false;
 
 	GamePanel() {
 		titleFont = new Font("Arial", Font.PLAIN, 48);
@@ -25,6 +31,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		frameDraw = new Timer(1000 / 60, this);
 		frameDraw.start();
 		r = new Rocketship(250, 700, 50, 50);
+		om = new ObjectManager(r);
+		if (needImage) {
+			loadImage("space-1.png");
+		}
 	}
 
 	@Override
@@ -43,6 +53,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	}
 
 	void updateGameState() {
+		om.update();
 	}
 
 	void updateEndState() {
@@ -60,9 +71,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	}
 
 	void drawGameState(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
-		r.draw(g);
+		if (gotImage) {
+			g.drawImage(image, 0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT, null);
+		} else {
+			g.setColor(Color.BLACK);
+			g.fillRect(0, 0, LeagueInvaders.WIDTH, LeagueInvaders.HEIGHT);
+		}
+		om.draw(g);
 	}
 
 	void drawEndState(Graphics g) {
@@ -72,7 +87,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		g.setColor(Color.BLACK);
 		g.drawString("GAME OVER", 90, 150);
 		g.setFont(bodyFont);
-		g.drawString("You have killed" + "enemies", 30, 400);
+		g.drawString("You have killed " + " enemies", 30, 400);
 		g.drawString("Press ENTER to restart", 60, 600);
 	}
 
@@ -111,20 +126,24 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		if (currentState == GAME) {
 			if (e.getKeyCode() == KeyEvent.VK_UP) {
 				System.out.println("UP");
-				if (r.y+(r.height/2) >= (r.height/2)) {
+				if (r.y + (r.height / 2) >= r.height) {
 					r.up();
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 				System.out.println("DOWN");
-				if (LeagueInvaders.HEIGHT - (r.y + r.height) >= (r.height/2)) {
+				if (LeagueInvaders.HEIGHT - (r.y + r.height) >= r.height) {
 					r.down();
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 				System.out.println("LEFT");
-				r.left();
+				if (r.x + r.width / 2 >= r.width) {
+					r.left();
+				}
 			} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
 				System.out.println("RIGHT");
-				r.right();
+				if (LeagueInvaders.WIDTH - (r.x + r.width) >= r.width / 2) {
+					r.right();
+				}
 			}
 		}
 
@@ -134,5 +153,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 
+	}
+
+	void loadImage(String imageFile) {
+		if (needImage) {
+			try {
+				image = ImageIO.read(this.getClass().getResourceAsStream(imageFile));
+				gotImage = true;
+			} catch (Exception e) {
+
+			}
+			needImage = false;
+		}
 	}
 }
