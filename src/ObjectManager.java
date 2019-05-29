@@ -1,20 +1,27 @@
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ObjectManager {
+public class ObjectManager implements ActionListener {
 	Rocketship r;
 	List<Projectile> projectiles;
 	List<Alien> aliens;
 	Random random;
+	int score;
 
 	ObjectManager(Rocketship r) {
 		this.r = r;
 		projectiles = new ArrayList<Projectile>();
 		aliens = new ArrayList<Alien>();
 		random = new Random();
+		score = 0;
+	}
 
+	int getScore() {
+		return score;
 	}
 
 	void addProjectile(Projectile p) {
@@ -48,6 +55,31 @@ public class ObjectManager {
 				p.isActive = false;
 			}
 		}
+		checkCollision();
+		purgeObjects();
+	}
+
+	void checkCollision() {
+//		for (Alien a : aliens) {
+//			if (r.collisionBox.intersects(a.collisionBox)) {
+//				r.isActive = false;
+//				a.isActive = false;
+//				break;
+//			}
+//			for (Projectile p : projectiles) {
+//				if (p.collisionBox.intersects(a.collisionBox)) {
+//					p.isActive = false;
+//					a.isActive = false;
+//					score++;
+//					break;
+//				}
+//			}
+//			if (a.isActive == false) {
+//				break;
+//			}
+//		}
+		
+//		use for loop, not for-each loop
 	}
 
 	void purgeObjects() {
@@ -61,5 +93,11 @@ public class ObjectManager {
 				projectiles.remove(projectiles.get(i));
 			}
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		addAlien();
 	}
 }

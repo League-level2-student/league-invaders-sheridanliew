@@ -24,6 +24,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	public static BufferedImage image;
 	public static boolean needImage = true;
 	public static boolean gotImage = false;
+	Timer alienSpawn;
 
 	GamePanel() {
 		titleFont = new Font("Arial", Font.PLAIN, 48);
@@ -48,12 +49,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		}
 	}
 
+	void startGame() {
+		alienSpawn = new Timer(1000, om);
+		alienSpawn.start();
+	}
+
 	void updateMenuState() {
 
 	}
 
 	void updateGameState() {
 		om.update();
+		if (r.isActive == false) {
+			currentState = END;
+		}
 	}
 
 	void updateEndState() {
@@ -87,7 +96,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		g.setColor(Color.BLACK);
 		g.drawString("GAME OVER", 90, 150);
 		g.setFont(bodyFont);
-		g.drawString("You have killed " + " enemies", 30, 400);
+		g.drawString("You have killed " + om.getScore() + " enemies", 30, 400);
 		g.drawString("Press ENTER to restart", 60, 600);
 	}
 
@@ -119,9 +128,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (currentState == END) {
 				currentState = MENU;
-			} else {
+				r = new Rocketship(250, 700, 50, 50);
+				om = new ObjectManager(r);
+			} else if (currentState == MENU) {
 				currentState++;
+				startGame();
+			} else if (currentState == GAME) {
+				currentState++;
+				alienSpawn.stop();
 			}
+//			else {
+//				currentState++;
+//			}
 		}
 		if (currentState == GAME) {
 			if (e.getKeyCode() == KeyEvent.VK_UP) {
@@ -144,6 +162,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 				if (LeagueInvaders.WIDTH - (r.x + r.width) >= r.width / 2) {
 					r.right();
 				}
+			}
+			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				om.addProjectile(r.getProjectile());
 			}
 		}
 
