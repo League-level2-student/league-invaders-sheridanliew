@@ -55,11 +55,25 @@ public class ObjectManager implements ActionListener {
 				p.isActive = false;
 			}
 		}
+		r.update();
 		checkCollision();
 		purgeObjects();
 	}
 
 	void checkCollision() {
+		for (int i = 0; i < aliens.size(); i++) {
+			if (r.collisionBox.intersects(aliens.get(i).collisionBox)) {
+				r.isActive = false;
+				aliens.get(i).isActive = false;
+			}
+			for (int j = 0; j < projectiles.size(); j++) {
+				if (projectiles.get(j).collisionBox.intersects(aliens.get(i).collisionBox)) {
+					projectiles.get(j).isActive = false;
+					aliens.get(i).isActive = false;
+					score++;
+				}
+			}
+		}
 //		for (Alien a : aliens) {
 //			if (r.collisionBox.intersects(a.collisionBox)) {
 //				r.isActive = false;
@@ -78,7 +92,7 @@ public class ObjectManager implements ActionListener {
 //				break;
 //			}
 //		}
-		
+
 //		use for loop, not for-each loop
 	}
 
